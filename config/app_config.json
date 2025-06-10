@@ -1,0 +1,42 @@
+{
+    "app": {
+        "name": "سامانه استخراج اطلاعات اسناد گمرکی",
+        "version": "1.0.0",
+        "author": "Mohsen-data-wizard",
+        "debug": true
+    },
+    "ocr": {
+        "easyocr": {
+            "languages": [
+                "fa",
+                "en"
+            ],
+            "gpu": true,
+            "model_storage_directory": "models",
+            "download_enabled": true
+        },
+        "tesseract": {
+            "path": "C:\\Program Files\\Tesseract-OCR\\tesseract.exe",
+            "languages": [
+                "fas",
+                "eng"
+            ]
+        }
+    },
+    "processing": {
+        "default_dpi": 350,
+        "max_workers": 2,
+        "timeout": 600,
+        "save_temp_files": false,
+        "temp_dir": "temp"
+    },
+    "paths": {
+        "output_dir": "output",
+        "log_dir": "logs",
+        "templates_dir": "templates"
+    },
+    "patterns": {
+        "import": "patterns/import_patterns.json",
+        "export": "patterns/export_patterns.json"
+    }
+}

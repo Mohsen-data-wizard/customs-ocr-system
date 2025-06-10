@@ -1,0 +1,21 @@
+﻿# OCR Libraries
+easyocr==1.7.0
+pytesseract==0.3.10
+opencv-python==4.8.1.78
+Pillow==10.0.1
+
+# PDF Processing
+PyMuPDF==1.23.8
+
+# Data Processing
+pandas==2.1.1
+numpy==1.24.3
+openpyxl==3.1.2
+
+# GUI
+tkinter-tooltip==2.0.1
+
+# Utilities
+pathlib2==2.3.7
+python-dateutil==2.8.2
+configparser==6.0.0

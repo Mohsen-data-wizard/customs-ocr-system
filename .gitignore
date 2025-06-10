@@ -1,0 +1,29 @@
+# محیط مجازی
+venv/
+env/
+
+# فایل‌های کامپایل شده پایتون
+__pycache__/
+*.py[cod]
+*$py.class
+
+# فایل‌های ساخت
+build/
+dist/
+*.spec
+*.exe
+
+# مسیرهای خروجی
+output/logs/
+output/debug/
+output/excel/
+data/temp/
+
+# فایل‌های IDE
+.idea/
+.vscode/
+*.iml
+
+# فایل‌های سیستمی
+.DS_Store
+Thumbs.db

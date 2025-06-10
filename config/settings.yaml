@@ -1,0 +1,183 @@
+﻿# تنظیمات اصلی سیستم استخراج دادههای گمرکی
+# ویرایش: 2025-06-10 09:45:00
+
+app:
+  name: "سیستم هوشمند استخراج دادههای گمرکی"
+  version: "2.0.0"
+  author: "Mohsen-data-wizard"
+  description: "سیستم پیشرفته OCR برای استخراج اطلاعات اسناد گمرکی"
+  
+# تنظیمات OCR
+ocr:
+  easyocr:
+    gpu: true
+    languages: ["fa", "en", "ar"]
+    width_ths: 0.8
+    height_ths: 0.8
+    download_enabled: true
+    verbose: false
+  
+  tesseract:
+    config: "--psm 6 -l eng+fas"
+    backup_configs:
+      - "--psm 4 -l eng+fas"
+      - "--psm 3 -l eng+fas"
+      - "--psm 1 -l eng+fas"
+    path: ""  # مسیر Tesseract (خالی = auto detect)
+
+# تنظیمات پردازش
+processing:
+  default_dpi: 350
+  min_dpi: 200
+  max_dpi: 600
+  max_files: 100
+  max_file_size_mb: 50
+  supported_formats: [".pdf"]
+  temp_cleanup: true
+  parallel_processing: false
+  
+  # تنظیمات پیشپردازش تصویر
+  image_preprocessing:
+    contrast_enhancement: true
+    noise_reduction: true
+    sharpening: true
+    clahe_clip_limit: 3.0
+    clahe_tile_grid: [8, 8]
+
+# تنظیمات استخراج
+extraction:
+  voting_threshold: 0.3  # حداقل درصد رای برای قبول
+  confidence_threshold: 30  # حداقل درجه اعتماد
+  min_pattern_matches: 1
+  
+  # پاکسازی دادهها
+  data_cleaning:
+    normalize_numbers: true
+    remove_extra_spaces: true
+    validate_formats: true
+
+# تنظیمات خروجی Excel
+export:
+  excel:
+    font_name: "B Nazanin"
+    font_size: 11
+    header_font_size: 12
+    header_color: "2E86AB"
+    header_text_color: "FFFFFF"
+    alternate_row_color: "F8F9FA"
+    border_color: "CCCCCC"
+    rtl_support: true
+    auto_filter: true
+    freeze_panes: true
+    
+    # عرض ستونها
+    column_widths:
+      شماره_کوتا: 15
+      شرح_کالا: 30
+      کد_کالا: 15
+      تعداد_بسته: 12
+      نوع_بسته: 12
+      نوع_ارز: 10
+      مبلغ_کل_فاکتور: 18
+      نرخ_ارز: 15
+      وزن_خالص: 12
+      تعداد_واحد_کالا: 15
+      نوع_معامله: 18
+      ارزش_گمرکی_قلم_کالا: 20
+      کشور_طرف_معامله: 15
+      بیمه: 15
+      کرایه: 15
+      
+  csv:
+    encoding: "utf-8-sig"
+    separator: ","
+    include_header: true
+    
+  json:
+    encoding: "utf-8"
+    indent: 2
+    ensure_ascii: false
+
+# تنظیمات لاگینگ
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "[%(asctime)s] %(levelname)s - %(name)s: %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+  file: "output/logs/customs_ocr.log"
+  max_file_size_mb: 10
+  backup_count: 5
+  
+  # لاگهای خاص
+  loggers:
+    easyocr: "WARNING"
+    pytesseract: "WARNING"
+    PIL: "ERROR"
+    
+# تنظیمات رابط کاربری
+ui:
+  theme: "clam"
+  window_size: "1800x1100"
+  window_state: "zoomed"  # normal, zoomed, fullscreen
+  
+  # رنگها
+  colors:
+    primary: "#2c3e50"
+    secondary: "#ecf0f1"
+    success: "#27ae60"
+    warning: "#f39c12"
+    error: "#e74c3c"
+    info: "#3498db"
+    
+  # فونتها
+  fonts:
+    default: "Tahoma"
+    header: "Tahoma"
+    monospace: "Consolas"
+    
+# تنظیمات پیشرفته
+advanced:
+  # کش
+  cache:
+    enabled: true
+    max_size_mb: 100
+    ttl_hours: 24
+    
+  # عملکرد
+  performance:
+    multiprocessing: false
+    max_workers: 4
+    chunk_size: 1
+    
+  # امنیت
+  security:
+    validate_inputs: true
+    sanitize_outputs: true
+    
+  # اشکالزدایی
+  debug:
+    save_intermediate_images: false
+    save_extracted_text: false
+    profiling: false
+
+# مسیرهای پیشفرض
+paths:
+  input: "data/input"
+  output: "output"
+  temp: "data/temp"
+  logs: "output/logs"
+  debug: "output/debug"
+  assets: "assets"
+  config: "config"
+
+# محدودیتها
+limits:
+  max_concurrent_files: 5
+  max_memory_usage_mb: 2048
+  timeout_seconds: 300
+  
+# پیامهای کاربر
+messages:
+  welcome: "به سیستم استخراج دادههای گمرکی خوش آمدید"
+  processing: "در حال پردازش..."
+  completed: "پردازش با موفقیت کامل شد"
+  error: "خطایی رخ داده است"
