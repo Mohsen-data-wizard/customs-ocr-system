@@ -19,23 +19,30 @@ from pathlib import Path
 current_dir = Path(__file__).parent
 sys.path.insert(0, str(current_dir))
 
-from gui.main_window import CustomsOCRApp
-from utils.logger import setup_logger
-from utils.config import ConfigManager
+try:
+    from gui.main_window import CustomsOCRApp
+    from utils.logger import setup_logger
+    from utils.config import ConfigManager
+except ImportError as e:
+    print(f"خطا در import: {e}")
+    sys.exit(1)
+
+
 
 def setup_environment():
     """راه‌اندازی محیط برنامه"""
-    # ایجاد پوشه‌های ضروری
+    base_dir = Path(__file__).parent.parent  # یک سطح بالاتر از src
+    
     required_dirs = [
-        "data/input",
-        "data/temp", 
-        "output/excel",
-        "output/logs",
-        "output/debug"
+        base_dir / "data" / "input",
+        base_dir / "data" / "temp", 
+        base_dir / "output" / "excel",
+        base_dir / "output" / "logs",
+        base_dir / "output" / "debug"
     ]
     
     for dir_path in required_dirs:
-        Path(dir_path).mkdir(parents=True, exist_ok=True)
+        dir_path.mkdir(parents=True, exist_ok=True)
     
     # راه‌اندازی لاگر
     setup_logger()
