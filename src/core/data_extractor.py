@@ -22,159 +22,101 @@ class DataExtractor:
         self.config = config
         self.preprocessor = AdvancedTextPreprocessor()
         logger.info("🎯 استخراجکننده دادهها راهاندازی شد")
-    
+
     def normalize_text(self, text: str) -> str:
-        """نرمالسازی متن"""
+        """نرمالسازی پیشرفته متن"""
         if not text:
             return ""
-        
+
         try:
-            # تبدیل ارقام فارسی و عربی به انگلیسی
-            persian_digits = '۰۱۲۳۴۵۶۷۸۹'
-            arabic_digits = '٠١٢٣٤٥٦٧٨٩'
-            english_digits = '0123456789'
-            
-            for p_digit, e_digit in zip(persian_digits, english_digits):
-                text = text.replace(p_digit, e_digit)
-            for a_digit, e_digit in zip(arabic_digits, english_digits):
-                text = text.replace(a_digit, e_digit)
-            
-            # یکسانسازی کاراکترها
-            text = text.replace('', 'ی')
+            # استفاده از پیش‌پردازشگر پیشرفته
+            preprocessed = self.preprocessor.preprocess(text)
+            text = preprocessed.get("normalized_text", text)
+
+            # تنظیمات اضافی
             text = text.replace('ك', 'ک')
             text = text.replace('ة', 'ه')
-            text = text.replace('ء', '')
-            
-            # حذف کاراکترهای کنترلی
             text = re.sub(r'[\u200c\u200d\ufeff\u200e\u200f]', '', text)
-            
-            # تنظیم فاصلهها
             text = re.sub(r'\s+', ' ', text)
-            
+
             return text.strip()
-            
+
         except Exception as e:
             logger.error(f"❌ خطا در نرمالسازی متن: {e}")
             return text
-    
-    def extract_field_with_voting(self, field_name: str, patterns: List[str], text: str) -> Optional[Dict[str, Any]]:
-        """استخراج فیلد با سیستم رایگیری"""
-        candidates = []
-        pattern_results = {}
-        
-        logger.debug(f"🔍 استخراج {field_name} با {len(patterns)} الگو")
-        
-        for i, pattern in enumerate(patterns):
-            try:
-                matches = re.findall(pattern, text, re.IGNORECASE | re.MULTILINE | re.DOTALL)
-                
-                if matches:
-                    pattern_matches = []
-                    for match in matches:
-                        if isinstance(match, tuple):
-                            # انتخاب اولین گروه غیرخالی
-                            match_value = next((m for m in match if m), "")
-                        else:
-                            match_value = match
-                        
-                        if match_value and str(match_value).strip():
-                            clean_match = str(match_value).strip()
-                            candidates.append(clean_match)
-                            pattern_matches.append(clean_match)
-                    
-                    if pattern_matches:
-                        pattern_results[f"pattern_{i+1}"] = pattern_matches
-                        logger.debug(f"   الگو {i+1}: {len(pattern_matches)} نتیجه")
-                
-            except Exception as e:
-                logger.warning(f"   الگو {i+1}: خطا - {e}")
-                continue
-        
-        if not candidates:
-            logger.debug(f"❌ {field_name}: هیچ نتیجهای یافت نشد")
-            return None
-        
-        # رایگیری
-        vote_counter = Counter(candidates)
-        winner, votes = vote_counter.most_common(1)[0]
-        
-        # محاسبه اعتماد
-        confidence = (votes / len(candidates)) * 100
-        
-        # پاکسازی نهایی
-        cleaned_winner = self.clean_extracted_value(field_name, winner)
-        
-        result = {
-            'value': cleaned_winner,
-            'confidence': confidence,
-            'votes': votes,
-            'total_candidates': len(candidates),
-            'all_candidates': list(set(candidates)),
-            'pattern_results': pattern_results
-        }
-        
-        logger.info(f"✅ {field_name}: '{cleaned_winner}' ({votes}/{len(candidates)} رای, {confidence:.1f}%)")
-        return result
-    
+
+    def extract_from_structured_json(self, structured_data: dict) -> Dict[str, Any]:
+        """استخراج از JSON ساختاریافته - بدون رای‌گیری"""
+        try:
+            logger.info("📝 استخراج از JSON ساختاریافته...")
+
+            # استفاده از pattern extractor جدید
+            pattern_extractor = CustomsPatternExtractor()
+            result = pattern_extractor.extract_from_structured_json(structured_data)
+
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ خطا در استخراج: {e}")
+            return {}
+
     def clean_extracted_value(self, field_name: str, value: str) -> str:
-        """پاکسازی مقادیر استخراج شده"""
+        """پاکسازی بهبود یافته مقادیر"""
         if not value:
             return ""
-        
+
         value = str(value).strip()
-        
+
         try:
             if field_name == "شرح_کالا":
-                # حذف اعداد بزرگ
+                # حذف کلمات نامربوط
+                unwanted_words = ['حقوق', 'برداخت', 'قانون', 'تنظیم', 'اظهار', 'مسنولیت', 'تاریخ']
+                for word in unwanted_words:
+                    value = value.replace(word, ' ')
+
+                # حذف اعداد بزرگ و نشانه‌های اضافی
                 value = re.sub(r'\d{5,}', '', value)
-                # حذف نشانههای تکراری
                 value = re.sub(r'[:\.\+\-]{2,}', ' ', value)
-                # تنظیم فاصلهها
                 value = ' '.join(value.split())
-                
-            elif field_name == "نوع_بسته":
-                # فقط انواع معتبر
-                valid_types = ['عدد', 'پالت', 'نگله', 'سایر', 'رول', 'کارتن', 'گونی', 'جعبه']
-                if value not in valid_types:
-                    # تلاش برای تطبیق تقریبی
-                    for valid_type in valid_types:
-                        if valid_type in value:
-                            return valid_type
+
+                # اگر خیلی کوتاه شد، خالی برگردان
+                if len(value) < 10:
                     return ""
-                    
-            elif field_name in ["وزن_خالص", "مبلغ_کل_فاکتور", "ارزش_گمرکی_قلم_کالا", 
-                               "نرخ_ارز", "بیمه", "کرایه"]:
-                # فقط اعداد و نقطه
+
+            elif field_name == "مبلغ_کل_فاکتور":
+                # نرمال‌سازی مبلغ
+                value = self.preprocessor.normalize_digits(value)
                 value = re.sub(r'[^\d\.]', '', value)
-                # حذف نقطههای اضافی
-                if value.count('.') > 1:
-                    parts = value.split('.')
-                    value = parts[0] + '.' + ''.join(parts[1:])
-                
-            elif field_name == "کد_کالا":
+
+            elif field_name == "نرخ_ارز":
+                # نرمال‌سازی نرخ ارز
+                value = self.preprocessor.normalize_digits(value)
+                value = re.sub(r'[^\d\.]', '', value)
+
+                # اگر خیلی کوچک است، احتمالاً اشتباه است
+                try:
+                    if float(value) < 1000:
+                        return ""
+                except:
+                    pass
+
+            elif field_name in ["کد_کالا", "شماره_کوتاژ"]:
                 # فقط 8 رقم
                 value = re.sub(r'[^\d]', '', value)
                 if len(value) != 8:
                     return ""
-                    
-            elif field_name == "شماره_کوتا":
-                # فقط 8 رقم
+
+            elif field_name == "مبلغ_حقوق_ورودی":
+                # نرمال‌سازی مبلغ حقوق
+                value = self.preprocessor.normalize_digits(value)
                 value = re.sub(r'[^\d]', '', value)
-                if len(value) != 8:
+
+                # حداقل 8 رقم باشد
+                if len(value) < 8:
                     return ""
-                    
-            elif field_name in ["کشور_طرف_معامله", "نوع_ارز"]:
-                # حروف بزرگ
-                value = value.upper()
-                
-            elif field_name in ["تعداد_بسته", "تعداد_واحد_کالا"]:
-                # فقط اعداد
-                value = re.sub(r'[^\d]', '', value)
-                if not value:
-                    return "1"  # مقدار پیشفرض
-            
+
             return value
-            
+
         except Exception as e:
             logger.error(f"❌ خطا در پاکسازی {field_name}: {e}")
             return value

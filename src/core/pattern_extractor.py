@@ -21,30 +21,161 @@ class CustomsPatternExtractor:
         logger.info("🔍 الگوهای استخراج گمرکی آماده شد")
 
     def _initialize_patterns(self) -> Dict[str, Dict[str, Any]]:
-        """تعریف الگوهای بهبود یافته"""
-        from patterns.improved_patterns import ImprovedRegexPatterns
+        """تعریف الگوهای استخراج از JSON ساختاریافته"""
+        return {
+            # شماره کوتاژ - 8 رقم در ابتدای فهرست
+            "شماره_کوتاژ": {
+                "patterns": [
+                    r'"کوتاژا",\s*"(\d{8})"',  # مستقیماً بعد از کوتاژا
+                    r'"(\d{8})",\s*"[0-9/\s]*"',  # 8 رقم در ابتدای فهرست
+                ],
+                "type": "string"
+            },
 
-        # استفاده از الگوهای بهبود یافته
-        improved_patterns = ImprovedRegexPatterns()
+            # کد کالا - 8 رقم قبل از "032"
+            "کد_کالا": {
+                "patterns": [
+                    r'"(\d{8})",\s*"032"',  # عدد 8 رقمی قبل از 032
+                    r'"ك٧٧",\s*"(\d{8})"',  # بعد از ك77
+                ],
+                "type": "string"
+            },
 
-        enhanced_patterns = {}
-        for field_name, patterns in improved_patterns.patterns.items():
-            enhanced_patterns[field_name] = {
-                "patterns": patterns,
+            # شماره ثبت سفارش
+            "کد_ثبت_سفارش": {
+                "patterns": [
+                    r'"سفارشس",\s*"(\d{8})"',  # بعد از سفارشس
+                    r'"(\d{8})",.*"سفارش"',  # 8 رقم قبل از کلمه سفارش
+                ],
+                "type": "string"
+            },
+
+            # وزن ناخالص - بین "38" و "س"
+            "وزن_ناخالص": {
+                "patterns": [
+                    r'"38",\s*"وزن",\s*"(\d+)",.*?"س"',  # بین 38 و س
+                    r'"(\d+)",\s*"38",\s*"وزن".*?"(\d+)",\s*"س"',  # دو عدد بین 38 و س
+                ],
+                "type": "float"
+            },
+
+            # نوع بسته - مستقیماً بعد از "نوع بسته"
+            "نوع_بسته": {
+                "patterns": [
+                    r'"نوع",\s*"بسته",\s*"([^"]*)"',  # مستقیماً بعد از نوع بسته
+                    r'"بسته",\s*"(نگله|رول|گونی|کارتن|عدد|جعبه|سایر|پالت)"',
+                ],
                 "type": "string",
-                "description": f"فیلد {field_name} با الگوهای بهبود یافته"
+                "valid_values": ["نگله", "رول", "گونی", "کارتن", "عدد", "جعبه", "سایر", "پالت"]
+            },
+
+            # نرخ ارز - فرمت 6رقم.0
+            "نرخ_ارز": {
+                "patterns": [
+                    r'"نرخ",\s*"ازز",.*?"(\d{6}\.0)"',  # 6 رقم + .0
+                    r'"(\d{6}\.0)"',  # هر جا که 6 رقم + .0 باشه
+                ],
+                "type": "float"
+            },
+
+            # نوع معامله - یکی از سه نوع
+            "نوع_معامله": {
+                "patterns": [
+                    r'"(حواله)",\s*"ادزی"',  # اگر حواله دید -> حواله ارزی
+                    r'"(پیله\s*وری)"',
+                    r'"(برات)"',
+                ],
+                "type": "string",
+                "valid_values": ["حواله ارزی", "پیله وری", "برات"],
+                "mapping": {"حواله": "حواله ارزی"}
+            },
+
+            # نوع ارز
+            "نوع_ارز": {
+                "patterns": [
+                    r'"(يورو)"',  # یورو در فهرست
+                    r'"(EUR|USD|GBP)"',
+                ],
+                "type": "string"
+            },
+
+            # مبلغ کل فاکتور - عدد بالای "بىكيرى"
+            "مبلغ_کل_فاکتور": {
+                "patterns": [
+                    r'"(\d+)",\s*"(\d+)",\s*"بىكيرى"',  # دو عدد بالای بىكيرى
+                    r'"انبار",.*?"(\d+)",.*?"بىكيرى"',  # عدد بین انبار و بىكيرى
+                ],
+                "type": "float"
+            },
+
+            # تعداد واحد کالا - عدد قبل از "بىكيرى"
+            "تعداد_واحد_کالا": {
+                "patterns": [
+                    r'"(\d+)",\s*"بىكيرى"',  # مستقیماً قبل از بىكيرى
+                ],
+                "type": "int"
+            },
+
+            # شرح کالا - از بعد "کالا" تا قبل "باقی"
+            "شرح_کالا": {
+                "patterns": [
+                    r'"شرح",\s*"کالا",\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)",.*?"باقی"',  # چندین کلمه
+                    r'"کالا",\s*"([^"]+)",.*?"باقی"',  # یک کلمه
+                ],
+                "type": "string"
+            },
+
+            # بیمه - مقدار مشخص شده
+            "بیمه": {
+                "patterns": [
+                    r'"نرخ",\s*"تعديل",\s*"نرخ",\s*"(\d+)"',  # بعد از نرخ تعدیل
+                ],
+                "type": "float"
+            },
+
+            # ارزش گمرکی قلم کالا - دو عدد ترکیبی
+            "ارزش_گمرکی_قلم_کالا": {
+                "patterns": [
+                    r'"(\d+)",\s*"(\d+)",\s*"اسناد"',  # دو عدد قبل از اسناد
+                ],
+                "type": "float"
+            },
+
+            # جمع حقوق و عوارض - بعد از "مدسه"
+            "جمع_حقوق_و_عوارض": {
+                "patterns": [
+                    r'"مدسه",\s*"(\d+)"',  # مستقیماً بعد از مدسه
+                ],
+                "type": "int"
+            },
+
+            # مبلغ مالیات بر ارزش افزوده - از کلمه "رسید"
+            "مبلغ_مالیات_بر_ارزش_افزوده": {
+                "patterns": [
+                    r'"رسید",\s*"\d+",\s*"(\d+)"',  # عدد بعد از رسید
+                ],
+                "type": "int"
+            },
+
+            # جمع حقوق عوارض - زیر کلمه "تضمین"
+            "مبلغ_حقوق_ورودی": {
+                "patterns": [
+                    r'"تضمین",\s*"(\d+)"',  # مستقیماً زیر تضمین
+                ],
+                "type": "int"
             }
+        }
 
-        return enhanced_patterns
-
-    def extract_field(self, text: str, field_name: str) -> Dict[str, Any]:
-        """استخراج یک فیلد خاص از متن"""
+    def extract_field(self, json_patterns: List[str], field_name: str) -> Dict[str, Any]:
+        """استخراج یک فیلد از فهرست JSON patterns"""
         if field_name not in self.patterns:
             return {"value": None, "confidence": 0, "matched_pattern": None}
 
         field_config = self.patterns[field_name]
         patterns = field_config["patterns"]
-        field_type = field_config["type"]
+
+        # تبدیل فهرست به متن قابل جستجو
+        text = '"' + '", "'.join(json_patterns) + '"'
 
         best_match = None
         best_confidence = 0
@@ -52,27 +183,33 @@ class CustomsPatternExtractor:
 
         for pattern in patterns:
             try:
-                matches = re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE)
+                matches = re.finditer(pattern, text, re.IGNORECASE)
                 for match in matches:
                     if match.groups():
-                        raw_value = match.group(1).strip()
+                        # اگر چند گروه داریم (مثل مبلغ فاکتور)
+                        if len(match.groups()) > 1:
+                            # ترکیب اعداد با نقطه
+                            raw_value = match.group(1) + "." + match.group(2)
+                        else:
+                            raw_value = match.group(1).strip()
                     else:
                         raw_value = match.group(0).strip()
 
-                    # محاسبه confidence بر اساس موقعیت و طول
-                    confidence = min(0.9, 0.5 + (len(raw_value) / 100))
+                    # اعتبارسنجی بر اساس فیلد
+                    if self._validate_field_value(field_name, raw_value, field_config):
+                        confidence = 0.95  # اعتماد بالا چون از JSON ساختاریافته میاد
 
-                    if confidence > best_confidence:
-                        best_match = raw_value
-                        best_confidence = confidence
-                        matched_pattern = pattern
+                        if confidence > best_confidence:
+                            best_match = raw_value
+                            best_confidence = confidence
+                            matched_pattern = pattern
 
             except Exception as e:
                 logger.debug(f"خطا در پردازش الگو {pattern}: {e}")
                 continue
 
-        # تبدیل نوع داده
-        converted_value = self._convert_value(best_match, field_type)
+        # تبدیل نوع داده و mapping
+        converted_value = self._convert_and_map_value(best_match, field_config)
 
         return {
             "value": converted_value,
@@ -81,25 +218,53 @@ class CustomsPatternExtractor:
             "raw_value": best_match
         }
 
-    def _convert_value(self, value: str, target_type: str) -> Any:
-        """تبدیل مقدار به نوع مناسب"""
+    def _validate_field_value(self, field_name: str, value: str, field_config: dict) -> bool:
+        """اعتبارسنجی مقدار بر اساس قوانین فیلد"""
+        if not value:
+            return False
+
+        try:
+            if field_name == "نرخ_ارز":
+                # باید 6 رقم + .0 باشه
+                return re.match(r'^\d{6}\.0$', value) is not None
+
+            elif field_name in ["شماره_کوتاژ", "کد_کالا", "کد_ثبت_سفارش"]:
+                # باید 8 رقم باشه
+                return re.match(r'^\d{8}$', value) is not None
+
+            elif field_name == "نوع_بسته":
+                valid_values = field_config.get("valid_values", [])
+                return value in valid_values
+
+            elif field_name == "نوع_معامله":
+                valid_values = field_config.get("valid_values", [])
+                mapping = field_config.get("mapping", {})
+                return value in valid_values or value in mapping
+
+            return True
+
+        except:
+            return False
+
+    def _convert_and_map_value(self, value: str, field_config: dict) -> Any:
+        """تبدیل و نگاشت مقدار"""
         if value is None:
             return None
 
         try:
-            if target_type == "int":
-                # حذف کاما و تبدیل به int
-                cleaned = re.sub(r'[,،]', '', str(value))
-                return int(float(cleaned))
+            # mapping اگر وجود دارد
+            mapping = field_config.get("mapping", {})
+            if value in mapping:
+                value = mapping[value]
 
-            elif target_type == "float":
-                # حذف کاما و تبدیل به float
-                cleaned = re.sub(r'[,،]', '', str(value))
-                return float(cleaned)
+            field_type = field_config.get("type", "string")
 
-            elif target_type == "string":
+            if field_type == "int":
+                return int(value)
+            elif field_type == "float":
+                return float(value)
+            elif field_type == "string":
                 return str(value).strip()
-
             else:
                 return value
 
