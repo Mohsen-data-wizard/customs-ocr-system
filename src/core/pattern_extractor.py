@@ -165,6 +165,8 @@ class CustomsPatternExtractor:
                 "type": "int"
             }
         }
+            # شماره کوتاژ - 8 رقم در ابتدای فهرست
+
 
     def extract_field(self, json_patterns: List[str], field_name: str) -> Dict[str, Any]:
         """استخراج یک فیلد از فهرست JSON patterns"""
