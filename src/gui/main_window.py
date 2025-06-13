@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -62,7 +62,7 @@ class LogHandler(logging.Handler):
                 self.text_widget.update_idletasks()
             except:
                 pass
-from core.pattern_extractor import CustomsPatternExtractor
+
 class CustomsOCRApp:
     """کلاس اصلی رابط گرافیکی"""
 
@@ -132,7 +132,8 @@ class CustomsOCRApp:
             messagebox.showerror("خطا", f"خطا در راه‌اندازی موتور OCR:\n{e}")
             sys.exit(1)
         self.pdf_processor = PDFProcessor(self.config)
-        self.data_extractor = DataExtractor(self.pattern_extractor, self.config)
+        data_extractor = DataExtractor(self.pattern_extractor, self.config)  # تغییر این خط
+        self.data_extractor = data_extractor
 
 
     def setup_logging(self):
@@ -352,13 +353,10 @@ class CustomsOCRApp:
         logger.info(f"📋 نوع سند تغییر کرد به: {doc_type}")
 
         # بروزرسانی الگوهای regex بر اساس نوع سند
-        if hasattr(self, 'CustomsPatternExtractor'):
+        if hasattr(self, 'pattern_manager'):
             try:
                 # بارگذاری مجدد الگوها
-                if doc_type == "وارداتی":
-                    patterns = self.CustomsPatternExtractor.import_patterns
-                else:
-                    patterns = self.CustomsPatternExtractor.export_patterns
+                patterns = self.pattern_extractor.CustomsPatternExtractor(doc_type)  # درست
                 logger.info(f"✅ الگوها بارگذاری شد: {len(patterns)} فیلد")
             except Exception as e:
                 logger.error(f"❌ خطا در بارگذاری الگوها: {e}")
@@ -1780,7 +1778,7 @@ class CustomsOCRApp:
 
             # بارگذاری الگوهای فعلی
             doc_type = self.document_type.get()
-            patterns = self.CustomsPatternExtractor.get_patterns(doc_type)
+            patterns = self.pattern_extractor.CustomsPatternExtractor(doc_type)
 
             for i, (field_name, field_patterns) in enumerate(patterns.items(), 1):
                 # نمایش اولین الگو
@@ -1813,7 +1811,7 @@ class CustomsOCRApp:
 
             if file_path:
                 doc_type = self.document_type.get()
-                patterns = self.CustomsPatternExtractor.get_patterns(doc_type)
+                patterns = self.pattern_extractor.get_patterns(doc_type)
 
                 with open(file_path, 'w', encoding='utf-8') as f:
                     json.dump(patterns, f, ensure_ascii=False, indent=2)
