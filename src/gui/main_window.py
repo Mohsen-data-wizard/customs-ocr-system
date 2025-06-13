@@ -132,8 +132,8 @@ class CustomsOCRApp:
             messagebox.showerror("خطا", f"خطا در راه‌اندازی موتور OCR:\n{e}")
             sys.exit(1)
         self.pdf_processor = PDFProcessor(self.config)
-        data_extractor = DataExtractor(self.pattern_extractor, self.config)  # تغییر این خط
-        self.data_extractor = data_extractor
+        self.data_extractor = DataExtractor(self.pattern_extractor, self.config)  # تغییر این خط
+        self.data_extractor = DataExtractor
 
 
     def setup_logging(self):
