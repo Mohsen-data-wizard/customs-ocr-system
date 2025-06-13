@@ -1,0 +1,85 @@
+[
+  {
+    "file_name": "1403.05.11.pdf",
+    "file_path": "C:/Users/Mohsen/PycharmProjects/PythonProject1/PythonProject1/customs-pdf-extractor/data/pdfs/import/1403.05.11.pdf",
+    "page_number": 1,
+    "extraction_result": {
+      "extracted_data": {
+        "شماره_کوتاژ": {
+          "value": "34384317",
+          "confidence": 0.58,
+          "matched_pattern": "کوتاژ[اه]?\\s*:?\\s*(\\d{8})",
+          "raw_value": "34384317"
+        },
+        "مبلغ_کل_فاکتور": {
+          "value": "٤٦١٣٧",
+          "confidence": 0.55,
+          "matched_pattern": "(\\d+(?:[\\d,]*)?(?:\\.\\d+)?)\\s*(EUR|USD)\\s*\\)",
+          "raw_value": "٤٦١٣٧"
+        },
+        "شرح_کالا": {
+          "value": "سایر حقوق بنای حقوق برداخت تاربخ تاریخ مسنولیت مربوطه  قانون تنظیم  اظهار جهت",
+          "confidence": 0.9,
+          "matched_pattern": "(?!.*(?:اسناد|صمیمه|انبار|کد|شماره))([آ-ی\\s]{20,200})",
+          "raw_value": "سایر حقوق بنای حقوق برداخت تاربخ تاریخ مسنولیت مربوطه  قانون تنظیم  اظهار جهت"
+        },
+        "نرخ_ارز": {
+          "value": "٢٢",
+          "confidence": 0.52,
+          "matched_pattern": "نرخ\\s*ارز\\s*:?\\s*([\\d,\\.]+)",
+          "raw_value": "٢٢"
+        },
+        "وزن_خالص": {
+          "value": null,
+          "confidence": 0,
+          "matched_pattern": null,
+          "raw_value": null
+        },
+        "وزن_ناخالص": {
+          "value": null,
+          "confidence": 0,
+          "matched_pattern": null,
+          "raw_value": null
+        },
+        "کد_کالا": {
+          "value": "34384317",
+          "confidence": 0.58,
+          "matched_pattern": "(\\d{8})\\s*(?=.*کالا)",
+          "raw_value": "34384317"
+        },
+        "کشور_طرف_معامله": {
+          "value": null,
+          "confidence": 0,
+          "matched_pattern": null,
+          "raw_value": null
+        },
+        "تعداد_بسته": {
+          "value": null,
+          "confidence": 0,
+          "matched_pattern": null,
+          "raw_value": null
+        },
+        "مبلغ_حقوق_ورودی": {
+          "value": "٢٠٧٦١٠٥٩٩٣",
+          "confidence": 0.6,
+          "matched_pattern": "(\\d{8,})\\s*ریال",
+          "raw_value": "٢٠٧٦١٠٥٩٩٣"
+        },
+        "مبلغ_مالیات_بر_ارزش_افزوده": {
+          "value": null,
+          "confidence": 0,
+          "matched_pattern": null,
+          "raw_value": null
+        }
+      },
+      "stats": {
+        "total_fields": 11,
+        "extracted_fields": 6,
+        "failed_fields": 5,
+        "high_confidence_fields": 1,
+        "extraction_time": 0.029921
+      }
+    },
+    "extracted_text": "بازركان الف : کمرک ورودی _ اظهارنامه وف ٣٠١ کد کمرک فهرست گه سماره نبت | کوتاژا 34384317 ٠٧٠٢٠ ٢٠٢٤ ٤٧؛١٣؛٢٠ تاربخ بایکانی : عطف # عت ه اقلام ٣٤٣٨٤٣١٧ ; مینی تاریخ : مانبفست : ١٤٠٠٥٠٣١١٢١ ٦١٥/٢٤ ١٨٣٦٥٨٥٢ مسول تسویه مالی ا صاحب کالا| ^ کبرنده اا . کد اجزا ارزش ١٠٩٣٤٤٧٠ ١٠. اجزا ارزش میلاد تجارت آتام منطقه أزاد ماکو , آدرس : اظهارنامه , تلفن : TR صادركننده ٠١٦ TI- مبدا ٠١٥ ١٤ . نماينده اظهاركننده : , تلفن : I٠١٢ش بارنامه : ٨٣٦٥٨٥٢ TR طرف معامله ٠١٧ حق العمل کار : FXW ٢٠. شرايط تحويل IR :١٩.ك ملیت ..."
+  }
+]

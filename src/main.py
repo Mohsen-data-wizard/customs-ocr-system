@@ -23,6 +23,7 @@ try:
     from gui.main_window import CustomsOCRApp
     from utils.logger import setup_logger
     from utils.config import ConfigManager
+    from core.pattern_extractor import CustomsPatternExtractor
 except ImportError as e:
     print(f"خطا در import: {e}")
     sys.exit(1)

@@ -9,16 +9,18 @@ import re
 import logging
 from typing import Dict, List, Optional, Any
 from collections import Counter
-from patterns.regex_patterns import PatternManager
+from .pattern_extractor import CustomsPatternExtractor
+from utils.text_preprocessor import AdvancedTextPreprocessor
 
 logger = logging.getLogger(__name__)
 
 class DataExtractor:
     """استخراجکننده دادهها"""
     
-    def __init__(self, pattern_manager: PatternManager, config):
-        self.pattern_manager = pattern_manager
+    def __init__(self, pattern_extractor: CustomsPatternExtractor, config):
+        self.pattern_extractor = CustomsPatternExtractor
         self.config = config
+        self.preprocessor = AdvancedTextPreprocessor()
         logger.info("🎯 استخراجکننده دادهها راهاندازی شد")
     
     def normalize_text(self, text: str) -> str:
@@ -188,9 +190,12 @@ class DataExtractor:
                 return {}
             
             logger.info(f"📝 استخراج از متن {len(normalized_text)} کاراکتری (نوع: {document_type})")
-            
+            logger.info(f"🔍 پیش‌نمایش متن استخراج شده (اول 500 کاراکتر):")
+            logger.info(f"📄 {repr(normalized_text[:500])}")
+            logger.info(f"🔍 پیش‌نمایش متن استخراج شده (آخر 500 کاراکتر):")
+            logger.info(f"📄 {repr(normalized_text[-500:])}")
             # انتخاب الگوها
-            patterns = self.pattern_manager.get_patterns(document_type)
+            patterns = self.CustomsPatternExtractor.get_patterns(document_type)
             
             # استخراج فیلدها
             extracted_data = {}
