@@ -18,7 +18,7 @@ class DataExtractor:
     """استخراجکننده دادهها"""
     
     def __init__(self, pattern_extractor: CustomsPatternExtractor, config):
-        self.pattern_extractor = CustomsPatternExtractor
+        self.pattern_extractor = pattern_extractor
         self.config = config
         self.preprocessor = AdvancedTextPreprocessor()
         logger.info("🎯 استخراجکننده دادهها راهاندازی شد")
@@ -195,7 +195,7 @@ class DataExtractor:
             logger.info(f"🔍 پیش‌نمایش متن استخراج شده (آخر 500 کاراکتر):")
             logger.info(f"📄 {repr(normalized_text[-500:])}")
             # انتخاب الگوها
-            patterns = self.CustomsPatternExtractor.get_patterns(document_type)
+            patterns = self.pattern_extractor.get_patterns(document_type)
             
             # استخراج فیلدها
             extracted_data = {}
