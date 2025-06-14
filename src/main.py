@@ -2,12 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-🚀 سیستم هوشمند استخراج داده‌های گمرکی
-نقطه ورود اصلی برنامه
-
-Author: Mohsen Data Wizard
-Date: 2025-06-09
-Version: 2.0.0
+🚀 سیستم ساده استخراج داده‌های گمرکی
+نسخه ساده شده - حذف پیچیدگی‌ها
 """
 
 import sys
@@ -15,7 +11,7 @@ import os
 import logging
 from pathlib import Path
 
-# اضافه کردن مسیر src به Python path
+# اضافه کردن مسیر src
 current_dir = Path(__file__).parent
 sys.path.insert(0, str(current_dir))
 
@@ -23,51 +19,46 @@ try:
     from gui.main_window import CustomsOCRApp
     from utils.logger import setup_logger
     from utils.config import ConfigManager
-    from core.pattern_extractor import CustomsPatternExtractor
 except ImportError as e:
     print(f"خطا در import: {e}")
     sys.exit(1)
 
 
-
 def setup_environment():
-    """راه‌اندازی محیط برنامه"""
-    base_dir = Path(__file__).parent.parent  # یک سطح بالاتر از src
-    
+    """راه‌اندازی محیط ساده"""
+    base_dir = Path(__file__).parent.parent
+
+    # فقط پوشه‌های ضروری
     required_dirs = [
-        base_dir / "data" / "input",
-        base_dir / "data" / "temp", 
-        base_dir / "output" / "excel",
-        base_dir / "output" / "logs",
-        base_dir / "output" / "debug"
+        base_dir / "data",
+        base_dir / "output"
     ]
-    
+
     for dir_path in required_dirs:
         dir_path.mkdir(parents=True, exist_ok=True)
-    
-    # راه‌اندازی لاگر
+
+    # لاگر ساده
     setup_logger()
-    
-    logging.info("🚀 راه‌اندازی سیستم استخراج داده‌های گمرکی")
-    logging.info(f"📍 مسیر اجرا: {current_dir}")
+    logging.info("🚀 سیستم ساده راه‌اندازی شد")
+
 
 def main():
-    """تابع اصلی برنامه"""
+    """تابع اصلی ساده"""
     try:
-        # راه‌اندازی محیط
         setup_environment()
-        
-        # بارگذاری تنظیمات
+
+        # کانفیگ ساده
         config = ConfigManager()
-        
-        # راه‌اندازی رابط گرافیکی
+
+        # رابط گرافیکی ساده
         app = CustomsOCRApp(config)
         app.run()
-        
+
     except Exception as e:
-        logging.error(f"❌ خطا در راه‌اندازی برنامه: {e}")
-        print(f"خطا در اجرای برنامه: {e}")
+        logging.error(f"❌ خطا: {e}")
+        print(f"خطا: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

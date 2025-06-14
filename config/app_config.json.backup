@@ -34,7 +34,7 @@
             "timeout": 30,
             "psm": 3
         },
-        "confidence_threshold": 0.2
+        "confidence_threshold": 0.1
     },
     "processing": {
         "default_dpi": 600,

@@ -1,0 +1,16 @@
+{
+  "pdf_info": {
+    "file_path": "C:/Users/Mohsen/PycharmProjects/PythonProject1/PythonProject1/customs-pdf-extractor/data/pdfs/import/1403.05.11.pdf",
+    "file_name": "1403.05.11",
+    "total_pages": 1,
+    "processed_pages": 0,
+    "output_directory": "C:\\Users\\Mohsen\\PycharmProjects\\PythonProject1\\PythonProject7\\customs-ocr-system\\data\\pdfs\\import\\extracted_pages"
+  },
+  "processing_summary": {
+    "total_extracted_fields": 0,
+    "average_confidence": 0,
+    "total_text_length": 0,
+    "processed_at": "2025-06-14T08:41:47.017309"
+  },
+  "pages": []
+}
